@@ -29,13 +29,32 @@
             computed: {
                 numeroProyectos () {
                     return this.proyectos.length;
+                },
+                porcentaje() {
+                    let completados = 0;
+
+                    this.proyectos.map(proyecto => {
+                        if(proyecto.completado)
+                        completados++;
+                    });
+
+                    return (completados * 100) / this.numeroProyectos;
                 }
             }
         };
 </script>
 <template>
-    <hr>
         <div class="row">
+            <div class="col-12 mb-4">
+                <h3 class="text-center">Progreso 0%</h3>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" 
+                    aria-valuenow="25" 
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    style="width: 50%"></div>
+                </div>
+            </div>
             <div class="col-12 col-md-4">
                 <form @submit.prevent="registrarProyecto">
                     <div class="mb-3">
