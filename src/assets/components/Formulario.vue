@@ -1,59 +1,7 @@
-<script>
-    export default {
-        data: () => ({
-            proyecto: "",
-            tipo: "",
-            urgente: false,
-            proyectos: [],
-        }),
-            methods: {
-                registrarProyecto() {
-                    const proyecto  = {
-                        proyecto: this.proyecto,
-                        tipo: this.tipo,
-                        urgente: this.urgente,
-                        completado: false,
-                    };
-                    this.proyectos.push(proyecto);
-
-                    this.proyecto = "";
-                    this.tipo = "";
-                    this.urgente = false;
-                },
-
-                cambiarEstado(proyecto, campo) {
-                    //this.proyectos[id].urgente = !this.proyectos[id].urgente;//
-                    proyecto[campo] = !proyecto[campo];
-                }
-            },
-            computed: {
-                numeroProyectos () {
-                    return this.proyectos.length;
-                },
-                porcentaje() {
-                    let completados = 0;
-
-                    this.proyectos.map(proyecto => {
-                        if(proyecto.completado)
-                        completados++;
-                    });
-
-                    return (completados * 100) / this.numeroProyectos;
-                }
-            }
-        };
-</script>
 <template>
         <div class="row">
             <div class="col-12 mb-4">
-                <h3 class="text-center">Progreso 0%</h3>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" 
-                    aria-valuenow="25" 
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    style="width: 50%"></div>
-                </div>
+                <progress-bar :porcentaje="porcentaje" />
             </div>
             <div class="col-12 col-md-4">
                 <form @submit.prevent="registrarProyecto">
@@ -80,29 +28,56 @@
             </div>
             <div class="col-12 col-md-8">
                 <h3>Total de proyectos: {{ numeroProyectos }}</h3>
-        <div class="table-responsive">
-            <table class="table table-dark table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Proyecto</th>
-                        <th>Tipo</th>
-                        <th>Urgente</th>
-                        <th>Completado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(proyecto, index) in proyectos" :key="index">
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ proyecto.proyecto }}</td>
-                        <td>{{ proyecto.tipo }}</td>
-                        <td @click="cambiarEstado(proyecto, 'urgente')" :class="proyecto.urgente ? 'bg-success' : 'bg-danger'">{{ proyecto.urgente ? "Si" : "No" }}</td>
-                        <td @click="cambiarEstado(proyecto, 'completado')" :class="proyecto.completado ? 'bg-success' : 'bg-danger'">{{ proyecto.completado ? "Completado" : "Incompleto" }}</td>
-                    </tr>
-                </tbody>
-                
-            </table>
-        </div>
+                <total-proyectos :numeroProyectos="numeroProyectos" :proyectos="proyectos" :cambiarEstado="cambiarEstado"/>
             </div>
         </div>
 </template>
+
+<script>
+    import ProgressBar from './ProgressBar.vue';
+    import TotalProyectos from './TotalProyectos.vue';
+    export default {
+    data: () => ({
+        proyecto: "",
+        tipo: "",
+        urgente: false,
+        proyectos: [],
+    }),
+    methods: {
+        registrarProyecto() {
+            const proyecto = {
+                proyecto: this.proyecto,
+                tipo: this.tipo,
+                urgente: this.urgente,
+                completado: false,
+            };
+            this.proyectos.push(proyecto);
+            localStorage.setItem("proyectos",JSON.stringify(this.proyectos))
+            this.proyecto = "";
+            this.tipo = "";
+            this.urgente = false;
+        },
+        cambiarEstado(proyecto, campo) {
+            //this.proyectos[id].urgente = !this.proyectos[id].urgente;//
+            proyecto[campo] = !proyecto[campo];
+        }
+    },
+    computed: {
+        numeroProyectos() {
+            return this.proyectos.length;
+        },
+        porcentaje() {
+            let completados = 0;
+            this.proyectos.map(proyecto => {
+                if (proyecto.completado)
+                    completados++;
+            });
+            return (completados * 100) / this.numeroProyectos || 0;
+        },
+    },
+    components: { ProgressBar, TotalProyectos },
+    mounted () {
+        this.Proyectos = JSON.parse(localStorage.getItem("proyectos")) || [];
+    }
+};
+</script>
