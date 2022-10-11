@@ -27,8 +27,13 @@
                 </form>
             </div>
             <div class="col-12 col-md-8">
-                <h3>Total de proyectos: {{ numeroProyectos }}</h3>
-                <total-proyectos :numeroProyectos="numeroProyectos" :proyectos="proyectos" :cambiarEstado="cambiarEstado"/>
+                <total-proyectos 
+                :numeroProyectos="numeroProyectos" 
+                :proyectos="proyectos" 
+                :cambiarEstado="cambiarEstado"
+                :limpiarData = "limpiarData"
+                :borrarTarea = "borrarTarea"
+                />
             </div>
         </div>
 </template>
@@ -52,7 +57,7 @@
                 completado: false,
             };
             this.proyectos.push(proyecto);
-            localStorage.setItem("proyectos",JSON.stringify(this.proyectos))
+            this.saveData();
             this.proyecto = "";
             this.tipo = "";
             this.urgente = false;
@@ -60,6 +65,20 @@
         cambiarEstado(proyecto, campo) {
             //this.proyectos[id].urgente = !this.proyectos[id].urgente;//
             proyecto[campo] = !proyecto[campo];
+            this.saveData();
+        },
+        saveData() {
+            localStorage.setItem("proyectos",JSON.stringify(this.proyectos))
+        },
+        limpiarData() {
+            this.proyectos = [];
+            localStorage.clear();
+        },
+        borrarTarea(proyectos, index) {
+            this.proyectos[index]="";
+            this.proyectos.splice(index,1)
+            localStorage.clear(proyectos.index);
+            this.saveData();
         }
     },
     computed: {
